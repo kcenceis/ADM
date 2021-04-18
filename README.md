@@ -15,7 +15,7 @@ ASUS路由器下载大师 windows客户端
   - ADM.exe        #主程序
   - ADM.runtimeconfig.json
 
-路由器地址(默认):192.168.50.1
+路由器地址(默认):192.168.50.1 开启外网访问则直接填写DDNS地址亦可,例如xxxx.asuscomm.com
 
 路由器端口(默认):8081
 
