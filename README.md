@@ -1,5 +1,5 @@
 # ADM
-ASUS路由器下载大师 windows端
+ASUS路由器下载大师 windows客户端
 
 # 开发缘故
 ASUS官方的下载windows端太差,只能新建torrent任务,2021年还有人新建torrent任务?
