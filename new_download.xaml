@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ADM"
         mc:Ignorable="d"
-        Title="new_download" Height="271" Width="551">
+        Title="new_download" Height="271" Width="551" ResizeMode="NoResize">
     <Grid>
         <TextBox HorizontalAlignment="Left" Margin="10,10,0,83" TextWrapping="Wrap" Width="521" RenderTransformOrigin="0.257,0.249" Name="download_link" />
         <Button Content="确定" HorizontalAlignment="Left" Margin="10,177,0,31" Width="521" IsDefault="True" Click="Button_Click"/>
