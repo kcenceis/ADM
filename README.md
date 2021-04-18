@@ -23,3 +23,6 @@ ASUS官方的网页端也很烂,新建任务卡半天,删除任务也卡半天,�
 用户名:路由器用户名
 
 密码:路由器密码
+
+# Capture
+<img width="658.4" height="357.2" align="left" src="https://github.com/kcenceis/ADM/blob/ac60beac0e279d47cca22cf1a4cf54251b5afc6f/png/ADM.png" alt="V2Ray"/>
