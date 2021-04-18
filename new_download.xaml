@@ -1,0 +1,13 @@
+﻿<Window x:Class="ADM.new_download"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ADM"
+        mc:Ignorable="d"
+        Title="new_download" Height="271" Width="551">
+    <Grid>
+        <TextBox HorizontalAlignment="Left" Margin="10,10,0,83" TextWrapping="Wrap" Width="521" RenderTransformOrigin="0.257,0.249" Name="download_link" />
+        <Button Content="确定" HorizontalAlignment="Left" Margin="10,177,0,31" Width="521" IsDefault="True" Click="Button_Click"/>
+    </Grid>
+</Window>
