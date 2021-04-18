@@ -2,8 +2,7 @@
 ASUS路由器下载大师 windows客户端
 
 # 开发缘故
-ASUS官方的下载windows端太差,只能新建torrent任务,2021年还有人新建torrent任务?
-ASUS官方的网页端也很烂,新建任务卡半天,删除任务也卡半天,什么都卡半天,效率十分低下
+因为ASUS官方匆忙制作出的Windows端和网页端，我.....
 
 # Development Environment
 - System:Windows 10 20H2
