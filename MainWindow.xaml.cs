@@ -139,7 +139,7 @@ namespace ADM
         private void delete_button_Click(object sender, RoutedEventArgs e)
         {
             // 防止无数据
-            if (list_view.SelectedIndex > 0)
+            if (list_view.SelectedIndex >= 0)
             {
                 // 获取选取的列表数
                 int list_view_num = list_view.SelectedIndex;
