@@ -25,4 +25,4 @@ ASUS路由器下载大师 windows客户端
 密码:路由器密码
 
 # Capture
-<img width="658.4" height="357.2" align="left" src="https://github.com/kcenceis/ADM/raw/main/png/ADM.png" alt="V2Ray"/>
+<img width="658.4" height="357.2" align="left" src="https://github.com/kcenceis/ADM/raw/main/png/ADM.png"/>
