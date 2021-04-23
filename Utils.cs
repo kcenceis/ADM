@@ -16,6 +16,7 @@ namespace ADM
         public static string router_url = "";
         public static string asus_cooike = ""; // cookies AuthByPasswd
         public static string path = ""; // cookies path
+        private static readonly string DefaultUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.114 Safari/537.36";
 
         public static void init()
         {
@@ -49,14 +50,16 @@ namespace ADM
 
         }
 
-        public static string HttpGet(string Url, string postDataStr)
+        public static  string HttpGet(string Url, string postDataStr)
         {
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(Url + (postDataStr == "" ? "" : "?") + postDataStr);
             request.Method = "GET";
             request.ContentType = "text/html;charset=UTF-8";
+            request.UserAgent = DefaultUserAgent;
             request.CookieContainer = new CookieContainer();
             request.CookieContainer.Add(new Cookie("AuthByPasswd", asus_cooike, @path , Utils.router));
             HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+
             Stream myResponseStream = response.GetResponseStream();
             StreamReader myStreamReader = new StreamReader(myResponseStream, Encoding.UTF8);
             string retString = myStreamReader.ReadToEnd();
@@ -77,6 +80,7 @@ namespace ADM
                 HttpWebRequest request = (HttpWebRequest)WebRequest.Create(Url);
                 CookieContainer myCookieContainer = new CookieContainer();
                 request.Method = "POST";
+                request.UserAgent = DefaultUserAgent;
                 request.ContentType = "application/x-www-form-urlencoded";
                 request.ContentLength = postDataStr.Length;
                 request.CookieContainer = myCookieContainer;
@@ -144,5 +148,12 @@ namespace ADM
             return urlEncode_str;
         }
 
+        // 删除[ ] 根据","分段
+        public static string[] delete_brackets(string text)
+        {
+            string tmp_string = text.TrimStart('[').TrimEnd(']');
+            return tmp_string.Split("\",\"");
+        }
+        
     }
 }

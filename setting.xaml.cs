@@ -4,9 +4,6 @@ using System.Windows;
 
 namespace ADM
 {
-    /// <summary>
-    /// setting.xaml 的交互逻辑
-    /// </summary>
     public partial class setting : Window
     {
         public setting()
