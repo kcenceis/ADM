@@ -10,6 +10,14 @@ namespace ADM
         public new_download()
         {
             InitializeComponent();
+            if (Clipboard.ContainsText(TextDataFormat.Text))
+            {
+                string clipboard_text = Clipboard.GetText(TextDataFormat.Text);
+                string magnet = "magnet:?xt=urn:btih:";
+                if (clipboard_text.Contains(magnet)) {
+                    download_link.Text = Clipboard.GetText(TextDataFormat.Text);
+                }
+            }
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)

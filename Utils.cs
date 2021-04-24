@@ -52,21 +52,49 @@ namespace ADM
 
         public static  string HttpGet(string Url, string postDataStr)
         {
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(Url + (postDataStr == "" ? "" : "?") + postDataStr);
-            request.Method = "GET";
-            request.ContentType = "text/html;charset=UTF-8";
-            request.UserAgent = DefaultUserAgent;
-            request.CookieContainer = new CookieContainer();
-            request.CookieContainer.Add(new Cookie("AuthByPasswd", asus_cooike, @path , Utils.router));
-            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+            try
+            {
+                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(Url + (postDataStr == "" ? "" : "?") + postDataStr);
+                request.Method = "GET";
+                request.ContentType = "text/html;charset=UTF-8";
+                request.UserAgent = DefaultUserAgent;
+                request.CookieContainer = new CookieContainer();
+                request.CookieContainer.Add(new Cookie("AuthByPasswd", asus_cooike, @path, Utils.router));
+                HttpWebResponse response = (HttpWebResponse)request.GetResponse();
 
-            Stream myResponseStream = response.GetResponseStream();
-            StreamReader myStreamReader = new StreamReader(myResponseStream, Encoding.UTF8);
-            string retString = myStreamReader.ReadToEnd();
-            myStreamReader.Close();
-            myResponseStream.Close();
+                Stream myResponseStream = response.GetResponseStream();
+                StreamReader myStreamReader = new StreamReader(myResponseStream, Encoding.UTF8);
+                string retString = myStreamReader.ReadToEnd();
+                myStreamReader.Close();
+                myResponseStream.Close();
 
-            return retString;
+                return retString;
+            }
+            catch (WebException ex)
+            {
+                HttpWebResponse res = (HttpWebResponse)ex.Response;
+                if (res == null)
+                {
+                    return "";
+                }
+                else if (res.StatusCode == HttpStatusCode.OK) //200
+                { }
+                else if (res.StatusCode == HttpStatusCode.BadRequest)//400
+                { }
+                else if (res.StatusCode == HttpStatusCode.NotFound)//404
+                { }
+                else if (res.StatusCode == HttpStatusCode.InternalServerError)//500
+                {
+
+                }
+                else if (res.StatusCode == HttpStatusCode.Unauthorized)//401
+                {
+
+                }
+                else
+                { }
+            }
+            return "";
         }
 
         /*
@@ -130,7 +158,9 @@ namespace ADM
                 else if (res.StatusCode == HttpStatusCode.NotFound)//404
                 { }
                 else if (res.StatusCode == HttpStatusCode.InternalServerError)//500
-                { }
+                {
+                    
+                }
                 else if (res.StatusCode == HttpStatusCode.Unauthorized)//401
                 {
                     MessageBox.Show("账号密码错误或者可能是账号密码错误次数过多,退出程序", "警告");
