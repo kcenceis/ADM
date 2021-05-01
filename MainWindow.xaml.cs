@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Configuration;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
@@ -12,13 +13,50 @@ namespace ADM
     /// </summary>
     public partial class MainWindow : Window
     {
-        Thread myThread;
-        BindingList<Person> s = new BindingList<Person>();
+        BindingList<List_> s = new BindingList<List_>();
+        GridView gridView;
+        private static string magnet_temp = "";
+        string[] gv_list_name = { "list_title_width",
+                "list_percent_width",
+                "list_size_width",
+                "list_status_width",
+                "list_time_width",
+                "list_type_width",
+                "list_download_speed_width",
+                "list_upload_speed_width",
+                "list_peers_width"
+            };
         public MainWindow()
         {
             InitializeComponent();
-           // myThread = new Thread(doWork);
+            gridView = list_view.View as GridView;
+            
+            // 读取配置文件中的窗口大小
+            int main_width= Convert.ToInt32(ConfigurationManager.AppSettings["Main_Width"]);
+            int main_height= Convert.ToInt32(ConfigurationManager.AppSettings["Main_Height"]);
+            this.Width = main_width;
+            this.Height = main_height;
+
+            for (int i = 0; i < gv_list_name.Length; i++)
+            {
+                string temp = ConfigurationManager.AppSettings[gv_list_name[i]];
+                if (temp != "NaN")
+                {
+                    int temp_int = Convert.ToInt32(temp);
+                    gridView.Columns[i+1].Width = temp_int;
+                }
+                else
+                {
+                    gridView.Columns[i+1].Width = gridView.Columns[i+1].ActualWidth;
+                    gridView.Columns[i+1].Width = Double.NaN;
+                }
+
+            }
+
+
+            // 获取cookies 进行初始化
             Utils.init();
+
             // 初始化列表,取数据
             string result = Utils.HttpGet(Utils.router_url + "/downloadmaster/dm_print_status.cgi", "action_mode=All").Trim();
 
@@ -29,7 +67,7 @@ namespace ADM
                 for (int i = 0; i < new_list.Length; i++)
                 {
                     string[] new_list_t = Utils.delete_brackets(new_list[i]);
-                    s.Add(new Person
+                    s.Add(new List_
                     {
                         table_id = new_list_t[0].Replace("\"", ""),
                         title = new_list_t[1],
@@ -46,49 +84,51 @@ namespace ADM
                 }
             }
             list_view.ItemsSource = s; // 绑定数据源
-                // 定时
-                DispatcherTimer timer = new DispatcherTimer();
-                timer.Interval = TimeSpan.FromMilliseconds(5000);                // 5秒刷新一次列表
-                timer.Tick += timer1_Tick;
-                timer.Start();
-            
-
+            // 5秒刷新一次列表
+            DispatcherTimer timer = new DispatcherTimer();
+            timer.Interval = TimeSpan.FromMilliseconds(5000);                
+            timer.Tick += timer_Tick;
+            timer.Start();
+            // 1秒捕捉一次剪贴板,30分钟重新获取一次cookies
+            DispatcherTimer timer1 = new DispatcherTimer();
+            timer1.Interval = TimeSpan.FromMilliseconds(1000);                
+            timer1.Tick += timer1_Tick;
+            timer1.Start();
         }
 
-        private void doWork(object obj)
-        {
-            Utils.init();
-            // 初始化列表,取数据
-            string result = Utils.HttpGet(Utils.router_url + "/downloadmaster/dm_print_status.cgi", "action_mode=All").Trim();
 
-            // 若无数据则不生成列表数据
-            if (result.Length > 0)
+
+        // 捕捉剪贴板的timer方法
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            if (Clipboard.ContainsText(TextDataFormat.Text))
             {
-                string[] new_list = result.Split("\n,");
-                for (int i = 0; i < new_list.Length; i++)
+                string clipboard_text = Clipboard.GetText(TextDataFormat.Text);
+                string magnet = "magnet:?xt=urn:btih:";
+                if (clipboard_text.Contains(magnet) && clipboard_text != magnet_temp)
                 {
-                    string[] new_list_t = Utils.delete_brackets(new_list[i]);
-                    s.Add(new Person
-                    {
-                        table_id = new_list_t[0].Replace("\"", ""),
-                        title = new_list_t[1],
-                        percent = new_list_t[2],
-                        size = new_list_t[3],
-                        status = new_list_t[4],
-                        type = new_list_t[5],
-                        time = new_list_t[6],
-                        download_speed = new_list_t[7],
-                        upload_speed = new_list_t[8],
-                        peers = new_list_t[9]
-                    });
-                    //list_view.Items.Add(s);
+                    string url = Utils.router_url + "/downloadmaster/dm_apply.cgi";
+                    string data = "action_mode=DM_ADD&download_type=5&again=no&usb_dm_url=" + clipboard_text;
+                    Utils.HttpGet(url, data);
+                    magnet_temp = clipboard_text;
+                    Clipboard.Clear();
                 }
             }
-            throw new NotImplementedException();
+
+            DateTime d2 = DateTime.Now; //获取当前时间
+            Utils.timeSpan = d2 - Utils.d1; // 计算时间差
+            // 10分钟重新获取一次cookies
+            if (TimeSpan.FromMinutes(10) <= Utils.timeSpan)
+            {
+                Utils.HttpPost(Utils.http_post_url,Utils.http_post_data); //获取cookies
+                Utils.d1 = DateTime.Now; //刷新时间
+            }
+
         }
 
+
         // 定时器方法
-        private void timer1_Tick(object sender, EventArgs e)
+        private void timer_Tick(object sender, EventArgs e)
         {
             string result = Utils.HttpGet(Utils.router_url + "/downloadmaster/dm_print_status.cgi", "action_mode=All").Trim();
             // 防止无数据
@@ -106,7 +146,7 @@ namespace ADM
                     for (int i = s.Count; i < new_list.Length; i++)
                     {
                         string[] new_list_t = Utils.delete_brackets(new_list[i]);
-                        s.Add(new Person
+                        s.Add(new List_
                         {
                             table_id = new_list_t[0].Replace("\"", ""),
                             title = new_list_t[1],
@@ -134,7 +174,7 @@ namespace ADM
                     {
                         string tmp_string = new_list[i].TrimStart('[').TrimEnd(']');
                         string[] new_list_t = tmp_string.Split("\",\"");
-                        Person per = list_view.Items[i] as Person;
+                        List_ per = list_view.Items[i] as List_;
                         string new_list_table_id = new_list_t[0].Replace("\"", "");
                         string new_list_title = new_list_t[1];
                         if (per.table_id == new_list_table_id && per.title == new_list_title)
@@ -168,7 +208,7 @@ namespace ADM
                     for (int i = 0; i < new_list.Length; i++)
                     {
                         string[] new_list_t = Utils.delete_brackets(new_list[i]);
-                        Person per = list_view.Items[i] as Person;
+                        List_ per = list_view.Items[i] as List_;
                         per.table_id = new_list_t[0].Replace("\"", "");
                         per.title = new_list_t[1];
                         per.percent = new_list_t[2];
@@ -190,22 +230,54 @@ namespace ADM
         }
         private void new_button_Click(object sender, RoutedEventArgs e)
         {
-            new_download nd = new new_download();
-            nd.ShowDialog();
+            // 不包含磁链头部 则打开下载窗口
+            if (Utils.direct_download == "True")
+            {
+                if (Clipboard.ContainsText(TextDataFormat.Text))
+                {
+                    string clipboard_text = Clipboard.GetText(TextDataFormat.Text);
+                    // 包含磁链头部 则直接下载
+                    string magnet = "magnet:?xt=urn:btih:";
+                    if (clipboard_text.Contains(magnet))
+                    {
+                        string url = Utils.router_url + "/downloadmaster/dm_apply.cgi";
+                        string data = "action_mode=DM_ADD&download_type=5&again=no&usb_dm_url=" + clipboard_text;
+                        Utils.HttpGet(url, data);
+
+                        Clipboard.Clear(); //清除剪贴板
+                    }
+                    else
+                    {
+                        new_download nd = new new_download();
+                        nd.ShowDialog();
+                    }
+                }
+                else
+                {
+                    new_download nd = new new_download();
+                    nd.ShowDialog();
+                }
+            }
+            else
+            {
+                new_download nd = new new_download();
+                nd.ShowDialog();
+            }
         }
         private void clean_Finish_Click(object sender, RoutedEventArgs e)
         {
             string url = Utils.router_url+"/downloadmaster/dm_apply.cgi";
             string data = "action_mode=DM_CTRL&dm_ctrl=clear&task_id=undefined&download_type=undefined";
+            s.Clear();
             Utils.HttpGet(url, data);
-            for ( int i = 0; i < s.Count; i++)
-            {
-                Person per = list_view.Items[i] as Person;
-                if (per.status=="Seeding")
-                {
-                    s.RemoveAt(i);
-                }
-            }
+            //for ( int i = 0; i < s.Count; i++)
+            //{
+            //    List_ per = list_view.Items[i] as List_;
+            //    if (per.status=="Seeding"||per.status=="Paused")
+            //    {
+            //        s.RemoveAt(i);
+            //    }
+            //}
         }
 
         /*
@@ -219,7 +291,7 @@ namespace ADM
                 // 获取选取的列表数
                 int list_view_num = list_view.SelectedIndex;
                 // 获取列表内容
-                Person per = list_view.Items[list_view_num] as Person;
+                List_ per = list_view.Items[list_view_num] as List_;
 
                 string url = Utils.router_url + "/downloadmaster/dm_apply.cgi";
                 string data = "action_mode=DM_CTRL" +
@@ -236,6 +308,49 @@ namespace ADM
         {
             setting st = new setting();
             st.ShowDialog();
+        }
+
+        // 窗体关闭监听事件
+        private void Window_Closing(object sender, CancelEventArgs e)
+        {
+            
+            Configuration cmo = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+            // 存储窗口大小
+            // 防止转换格式时出现错误
+            if ((int)this.Width == -2147483648)
+            {
+                // 发生错误则保存为默认值
+                cmo.AppSettings.Settings["Main_Width"].Value = "834";
+            }
+            else
+            {
+                cmo.AppSettings.Settings["Main_Width"].Value = ((int)this.Width).ToString();
+
+            }
+            if ((int) this.Height== -2147483648)
+            {
+                cmo.AppSettings.Settings["Main_Height"].Value = "452";
+            }
+            else
+            {
+                cmo.AppSettings.Settings["Main_Height"].Value = ((int)this.Height).ToString();
+            }
+                
+            // 存储列表的宽度
+            for(int i = 0; i < gv_list_name.Length; i++)
+            {
+                // 防止转换格式时出现错误
+                if (((int)gridView.Columns[i+1].Width) == -2147483648)
+                {
+                    cmo.AppSettings.Settings[gv_list_name[i]].Value = "NaN";
+                }
+                else
+                {
+                    cmo.AppSettings.Settings[gv_list_name[i]].Value = ((int)gridView.Columns[i+1].Width).ToString();
+                }
+            }
+            cmo.Save();
+
         }
     }
 }

@@ -17,6 +17,12 @@ namespace ADM
         public static string asus_cooike = ""; // cookies AuthByPasswd
         public static string path = ""; // cookies path
         private static readonly string DefaultUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.114 Safari/537.36";
+        public static string direct_download = ConfigurationManager.AppSettings["direct_download"];
+        public static string http_post_url;
+        public static string http_post_data;
+        public static DateTime d1; // 创建时间对象
+        public static TimeSpan timeSpan; //创建时间差
+
 
         public static void init()
         {
@@ -30,6 +36,8 @@ namespace ADM
             username = ConfigurationManager.AppSettings["username"];
             password = ConfigurationManager.AppSettings["password"];
 
+
+
             // 防止router,port,username,password字段为空
             if (router != "" && port != "" && username != ""&& password!="")
             {
@@ -39,7 +47,11 @@ namespace ADM
                 password = Base64_Convert(password);
 
                 // 获取登录cookies
-                HttpPost(router_url + "/check.asp", "flag=&login_username=" + username + "&login_passwd=" + password + "&directurl=%2Fdownloadmaster%2Findex.asp");
+                http_post_url = router_url + "/check.asp";
+                http_post_data = "flag=&login_username=" + username + "&login_passwd=" + password + "&directurl=%2Fdownloadmaster%2Findex.asp";
+                HttpPost(http_post_url, http_post_data);
+                // 记录获取到cookies的系统时间,用于更新cookies 防止超时
+                d1 = DateTime.Now;
             }
             else
             {
@@ -57,6 +69,8 @@ namespace ADM
                 HttpWebRequest request = (HttpWebRequest)WebRequest.Create(Url + (postDataStr == "" ? "" : "?") + postDataStr);
                 request.Method = "GET";
                 request.ContentType = "text/html;charset=UTF-8";
+                request.Timeout = 5000;
+                request.KeepAlive = true;
                 request.UserAgent = DefaultUserAgent;
                 request.CookieContainer = new CookieContainer();
                 request.CookieContainer.Add(new Cookie("AuthByPasswd", asus_cooike, @path, Utils.router));
@@ -108,6 +122,8 @@ namespace ADM
                 HttpWebRequest request = (HttpWebRequest)WebRequest.Create(Url);
                 CookieContainer myCookieContainer = new CookieContainer();
                 request.Method = "POST";
+                request.Timeout = 5000;
+                request.KeepAlive = true;
                 request.UserAgent = DefaultUserAgent;
                 request.ContentType = "application/x-www-form-urlencoded";
                 request.ContentLength = postDataStr.Length;

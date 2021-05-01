@@ -5,9 +5,10 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ADM"
         mc:Ignorable="d"
-        Title="new_download" Height="271" Width="551" ResizeMode="NoResize">
-    <Grid>
-        <TextBox HorizontalAlignment="Left" Margin="10,10,0,83" TextWrapping="Wrap" Width="521" RenderTransformOrigin="0.257,0.249" Name="download_link" />
-        <Button Content="确定" HorizontalAlignment="Left" Margin="10,177,0,31" Width="521" IsDefault="True" Click="Button_Click"/>
+        Title="new_download" Height="325" Width="566" ResizeMode="NoResize">
+    <Grid Margin="0,0,0,-5">
+        <TextBox HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Width="521" RenderTransformOrigin="0.257,0.249" Name="download_link" Height="178" VerticalAlignment="Top" />
+        <Button Content="确定" HorizontalAlignment="Left" Margin="10,233,0,0" Width="521" IsDefault="True" Click="Button_Click" Height="31" VerticalAlignment="Top"/>
+        <CheckBox x:Name="CheckBox_direct_download" Content="检测到连接直接添加" HorizontalAlignment="Left" Margin="10,204,0,0" VerticalAlignment="Top" Checked="CheckBox_Checked" Unchecked="CheckBox_Checked"/>
     </Grid>
 </Window>

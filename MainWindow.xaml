@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ADM"
         mc:Ignorable="d"
-        Title="ADM" Height="452" Width="834">
+        Title="ADM" Height="452" Width="834"  Closing="Window_Closing">
     <Grid>
         <Button Content="新建任务" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Height="40" Width="69" Click="new_button_Click"/>
         <Button Content="清除已完成任务" Margin="153,10,0,0" x:Name="clean_Finish" Click="clean_Finish_Click" Height="40" VerticalAlignment="Top" HorizontalAlignment="Left" Width="97"/>
@@ -13,14 +13,14 @@
             <ListView.View>
                 <GridView>
                     <GridViewColumn Header="Table_id" DisplayMemberBinding="{Binding table_id}"  Width="0"></GridViewColumn>
-                    <GridViewColumn Header="标题" DisplayMemberBinding="{Binding title}" Width="300" ></GridViewColumn>
+                    <GridViewColumn Header="标题" DisplayMemberBinding="{Binding title}"  ></GridViewColumn>
                     <GridViewColumn Header="百分比" DisplayMemberBinding="{Binding percent}"></GridViewColumn>
                     <GridViewColumn Header="大小" DisplayMemberBinding="{Binding size}"></GridViewColumn>
                     <GridViewColumn Header="状态" DisplayMemberBinding="{Binding status}"></GridViewColumn>
                     <GridViewColumn Header="类型" DisplayMemberBinding="{Binding type}"></GridViewColumn>
-                    <GridViewColumn Header="运行时间" DisplayMemberBinding="{Binding time}" Width="70"></GridViewColumn>
-                    <GridViewColumn Header="下载" DisplayMemberBinding="{Binding download_speed}" Width="70"></GridViewColumn>
-                    <GridViewColumn Header="上传" DisplayMemberBinding="{Binding upload_speed}" Width="70"></GridViewColumn>
+                    <GridViewColumn Header="运行时间" DisplayMemberBinding="{Binding time}" ></GridViewColumn>
+                    <GridViewColumn Header="下载" DisplayMemberBinding="{Binding download_speed}" ></GridViewColumn>
+                    <GridViewColumn Header="上传" DisplayMemberBinding="{Binding upload_speed}" ></GridViewColumn>
                     <GridViewColumn Header="peers" DisplayMemberBinding="{Binding peers}"></GridViewColumn>
                 </GridView>
             </ListView.View>
