@@ -5,7 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ADM"
         mc:Ignorable="d"
-        Title="ADM" Height="452" Width="834"  Closing="Window_Closing">
+        Title="ADM" Height="452" Width="834"  Closing="Window_Closing"
+        >
     <Grid>
         <Button Content="新建任务" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Height="40" Width="69" Click="new_button_Click"/>
         <Button Content="清除已完成任务" Margin="153,10,0,0" x:Name="clean_Finish" Click="clean_Finish_Click" Height="40" VerticalAlignment="Top" HorizontalAlignment="Left" Width="97"/>

@@ -5,8 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ADM"
         mc:Ignorable="d"
-        Title="setting" Height="179" Width="238" ResizeMode="NoResize">
-    <Grid>
+        Title="setting" Height="213" Width="240" ResizeMode="NoResize">
+    <Grid Margin="0,0,17,-15">
         <Label Content="路由器地址" HorizontalContentAlignment="Center" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
         <Label Content="路由器端口" HorizontalContentAlignment="Center" HorizontalAlignment="Left" Margin="10,35,0,0" VerticalAlignment="Top" Width="70"/>
         <Label Content="用户名" HorizontalContentAlignment="Center" HorizontalAlignment="Left" Margin="10,60,0,0" VerticalAlignment="Top" Width="70"/>
@@ -15,7 +15,8 @@
         <TextBox x:Name="textbox_port" Margin="85,39,0,0" Text="TextBox" TextWrapping="Wrap" HorizontalAlignment="Left" Width="120" Height="17" VerticalAlignment="Top"/>
         <TextBox x:Name="textbox_username" Margin="85,64,0,0" Text="TextBox" TextWrapping="Wrap" HorizontalAlignment="Left" Width="120" Height="17" VerticalAlignment="Top"/>
         <TextBox x:Name="textbox_password" Margin="85,89,0,0" Text="TextBox" TextWrapping="Wrap" HorizontalAlignment="Left" Width="120" Height="17" VerticalAlignment="Top"/>
-        <Button x:Name="btn_confirm" Content="确定" Margin="10,115,0,0" IsDefault="True" HorizontalAlignment="Left" Width="195" Height="19" VerticalAlignment="Top" Click="btn_confirm_Click"/>
+        <Button x:Name="btn_confirm" Content="确定" Margin="10,140,0,0" IsDefault="True" HorizontalAlignment="Left" Width="195" Height="19" VerticalAlignment="Top" Click="btn_confirm_Click"/>
+        <Button x:Name="default_downloader" Content="默认磁链下载工具" HorizontalAlignment="Left" Margin="10,115,0,0" VerticalAlignment="Top" Click="default_downloader_btn"/>
 
     </Grid>
 </Window>

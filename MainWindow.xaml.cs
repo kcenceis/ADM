@@ -26,6 +26,7 @@ namespace ADM
                 "list_upload_speed_width",
                 "list_peers_width"
             };
+        private static Boolean isCleaned = true;
         public MainWindow()
         {
             InitializeComponent();
@@ -53,9 +54,11 @@ namespace ADM
 
             }
 
-
-            // 获取cookies 进行初始化
-            Utils.init();
+            if (Utils.isInit == false)
+            {
+                // 获取cookies 进行初始化
+                Utils.init();
+            }
 
             // 初始化列表,取数据
             string result = Utils.HttpGet(Utils.router_url + "/downloadmaster/dm_print_status.cgi", "action_mode=All").Trim();
@@ -94,6 +97,7 @@ namespace ADM
             timer1.Interval = TimeSpan.FromMilliseconds(1000);                
             timer1.Tick += timer1_Tick;
             timer1.Start();
+
         }
 
 
@@ -170,34 +174,51 @@ namespace ADM
                  */
                 else if (s.Count > new_list.Length)
                 {
-                    for (int i = 0; i < new_list.Length; i++)
+                    s.Clear();
+                    for (int i = s.Count; i < new_list.Length; i++)
                     {
-                        string tmp_string = new_list[i].TrimStart('[').TrimEnd(']');
-                        string[] new_list_t = tmp_string.Split("\",\"");
-                        List_ per = list_view.Items[i] as List_;
-                        string new_list_table_id = new_list_t[0].Replace("\"", "");
-                        string new_list_title = new_list_t[1];
-                        if (per.table_id == new_list_table_id && per.title == new_list_title)
+                        string[] new_list_t = Utils.delete_brackets(new_list[i]);
+                        s.Add(new List_
                         {
-                            continue;
-                        }
-                        else if(per.table_id == new_list_table_id)
-                        {
-                            per.title = new_list_title;
-                            per.percent = new_list_t[2];
-                            per.size = new_list_t[3];
-                            per.status = new_list_t[4];
-                            per.type = new_list_t[5];
-                            per.time = new_list_t[6];
-                            per.download_speed = new_list_t[7];
-                            per.upload_speed = new_list_t[8];
-                            per.peers = new_list_t[9];
-                        }
-                        else
-                        {
-                            s.RemoveAt(i);
-                        }
+                            table_id = new_list_t[0].Replace("\"", ""),
+                            title = new_list_t[1],
+                            percent = new_list_t[2],
+                            size = new_list_t[3],
+                            status = new_list_t[4],
+                            type = new_list_t[5],
+                            time = new_list_t[6],
+                            download_speed = new_list_t[7],
+                            upload_speed = new_list_t[8],
+                            peers = new_list_t[9]
+                        });
                     }
+                    //for (int i = 0; i < s.Count; i++)
+                    //{
+                    //    string[] new_list_t = Utils.delete_brackets(new_list[i]);
+                    //    List_ per = list_view.Items[i] as List_;
+                    //    string new_list_table_id = new_list_t[0].Replace("\"", "");
+                    //    string new_list_title = new_list_t[1];
+                    //    if (per.table_id == new_list_table_id && per.title == new_list_title)
+                    //    {
+                    //        continue;
+                    //    }
+                    //    else if(per.table_id == new_list_table_id)
+                    //    {
+                    //        per.title = new_list_title;
+                    //        per.percent = new_list_t[2];
+                    //        per.size = new_list_t[3];
+                    //        per.status = new_list_t[4];
+                    //        per.type = new_list_t[5];
+                    //        per.time = new_list_t[6];
+                    //        per.download_speed = new_list_t[7];
+                    //        per.upload_speed = new_list_t[8];
+                    //        per.peers = new_list_t[9];
+                    //    }
+                    //    else
+                    //    {
+                    //        s.RemoveAt(i);
+                    //    }
+                    //}
                 }
                 /*
                  * 没有新的下载增加,直接进行刷新操作
@@ -266,10 +287,22 @@ namespace ADM
         }
         private void clean_Finish_Click(object sender, RoutedEventArgs e)
         {
-            string url = Utils.router_url+"/downloadmaster/dm_apply.cgi";
-            string data = "action_mode=DM_CTRL&dm_ctrl=clear&task_id=undefined&download_type=undefined";
-            s.Clear();
-            Utils.HttpGet(url, data);
+            
+            if (isCleaned == true)
+            {
+                isCleaned = false;
+                // 线程更新UI
+                //this.Dispatcher.Invoke(DispatcherPriority.Normal,(ThreadStart)delegate()
+                //{
+                //    //Clean_Finish(); 
+                //    isCleaned = true;
+                //});
+                new Thread(Clean_Finish).Start();
+            }
+            //string url = Utils.router_url+"/downloadmaster/dm_apply.cgi";
+            //string data = "action_mode=DM_CTRL&dm_ctrl=clear&task_id=undefined&download_type=undefined";
+            //s.Clear();
+            //Utils.HttpGet(url, data);
             //for ( int i = 0; i < s.Count; i++)
             //{
             //    List_ per = list_view.Items[i] as List_;
@@ -280,6 +313,14 @@ namespace ADM
             //}
         }
 
+        private void Clean_Finish()
+        {
+            string url = Utils.router_url + "/downloadmaster/dm_apply.cgi";
+            string data = "action_mode=DM_CTRL&dm_ctrl=clear&task_id=undefined&download_type=undefined";
+            // s.Clear();
+            Utils.HttpGet(url, data);
+            isCleaned = true;
+        }
         /*
          *  删除按钮点击触发
          */

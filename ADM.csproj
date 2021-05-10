@@ -7,6 +7,8 @@
     <AssemblyName>ADM</AssemblyName>
     <RootNamespace>ADM</RootNamespace>
     <WarningLevel>5</WarningLevel>
+    <ApplicationManifest>App.manifest</ApplicationManifest>
+    <StartupObject>ADM.App</StartupObject>
   </PropertyGroup>
 
 </Project>

@@ -4,6 +4,7 @@ using System.Net;
 using System.Text;
 using System.Configuration;
 using System.Windows;
+using System.Diagnostics;
 
 namespace ADM
 {
@@ -22,6 +23,7 @@ namespace ADM
         public static string http_post_data;
         public static DateTime d1; // 创建时间对象
         public static TimeSpan timeSpan; //创建时间差
+        public static Boolean isInit = false;
 
 
         public static void init()
@@ -59,6 +61,7 @@ namespace ADM
                 new setting().ShowDialog();
                 Environment.Exit(0);
             }
+            isInit = true;
 
         }
 
@@ -200,6 +203,33 @@ namespace ADM
             string tmp_string = text.TrimStart('[').TrimEnd(']');
             return tmp_string.Split("\",\"");
         }
-        
+
+        // 调试用
+       public static void WriteMessage(string msg)
+        {
+            using (FileStream fs = new FileStream(@"d:\test.txt", FileMode.OpenOrCreate, FileAccess.Write))
+            {
+                using (StreamWriter sw = new StreamWriter(fs))
+                {
+                    sw.BaseStream.Seek(0, SeekOrigin.End);
+                    sw.WriteLine("{0}\n", msg, DateTime.Now);
+                    sw.Flush();
+                }
+            }
+        }
+        // 杀死进程
+        public static void killProcess(string processName)
+        {
+            Process[] p = Process.GetProcessesByName(processName);
+            foreach (Process ps in p)
+            {
+                ps.Kill();
+            }
+        }
+        // 检查是否存在进程
+        public static Process[] checkProcess(string processName)
+        {
+            return Process.GetProcessesByName(processName);
+        }
     }
 }

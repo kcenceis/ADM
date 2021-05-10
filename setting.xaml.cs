@@ -1,6 +1,8 @@
 ﻿using System.Configuration;
 using System.Diagnostics;
+using System.Security.Principal;
 using System.Windows;
+using Microsoft.Win32;
 
 namespace ADM
 {
@@ -37,6 +39,30 @@ namespace ADM
             // System.Diagnostics.Process.Start(startpath + "\\ASUS_DM.exe"); 
             System.Diagnostics.Process.Start(fileName); // 启动程序
             Application.Current.Shutdown(); //关闭程序
+        }
+
+        private void default_downloader_btn(object sender, RoutedEventArgs e)
+        {
+
+            WindowsIdentity windowsIdentity = WindowsIdentity.GetCurrent();
+            WindowsPrincipal windowsPrincipal = new WindowsPrincipal(windowsIdentity);
+            if (windowsPrincipal.IsInRole(WindowsBuiltInRole.Administrator))
+            {
+                RegistryKey classroot = Microsoft.Win32.Registry.ClassesRoot.CreateSubKey("magnet");
+                //RegistryKey magnetURL = classroot.CreateSubKey("@", true);
+                classroot.SetValue("", "URL:Magnet link");
+                classroot.SetValue("Content Type", "application/x-magnet");
+                classroot.SetValue("URL Protocol", "");
+               
+                RegistryKey shellKey = classroot.CreateSubKey("shell", true);
+                RegistryKey openKey = shellKey.CreateSubKey("open", true);
+                RegistryKey commandKey = openKey.CreateSubKey("command", true);
+                string DirectoryName = System.Environment.CurrentDirectory;
+
+
+                commandKey.SetValue("", "\"" + DirectoryName + "\\ADM.exe\" \"%1\"");
+            }
+
         }
     }
 }
