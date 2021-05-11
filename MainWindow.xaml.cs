@@ -135,6 +135,7 @@ namespace ADM
         private void timer_Tick(object sender, EventArgs e)
         {
             string result = Utils.HttpGet(Utils.router_url + "/downloadmaster/dm_print_status.cgi", "action_mode=All").Trim();
+
             // 防止无数据
             if (result.Length > 0)
             {
@@ -174,7 +175,7 @@ namespace ADM
                  */
                 else if (s.Count > new_list.Length)
                 {
-                    s.Clear();
+                    
                     for (int i = s.Count; i < new_list.Length; i++)
                     {
                         string[] new_list_t = Utils.delete_brackets(new_list[i]);
@@ -291,13 +292,23 @@ namespace ADM
             if (isCleaned == true)
             {
                 isCleaned = false;
-                // 线程更新UI
-                //this.Dispatcher.Invoke(DispatcherPriority.Normal,(ThreadStart)delegate()
+                new Thread(Clean_Finish).Start();
+                //this.Dispatcher.Invoke(DispatcherPriority.Normal, (ThreadStart)delegate ()
                 //{
                 //    //Clean_Finish(); 
-                //    isCleaned = true;
+                //    //s.Clear();
+                //    for ( int i = 0; i < list_view.Items.Count; i++)
+                //    {
+                //        List_ per = list_view.Items[i] as List_;
+                //        if (per.status=="Seeding"||per.status=="Paused")
+                //        {
+                //            s.Clear();
+                //            break;
+                //        }
+                //    }
                 //});
-                new Thread(Clean_Finish).Start();
+                
+                // 线程更新UI
             }
             //string url = Utils.router_url+"/downloadmaster/dm_apply.cgi";
             //string data = "action_mode=DM_CTRL&dm_ctrl=clear&task_id=undefined&download_type=undefined";
@@ -319,6 +330,21 @@ namespace ADM
             string data = "action_mode=DM_CTRL&dm_ctrl=clear&task_id=undefined&download_type=undefined";
             // s.Clear();
             Utils.HttpGet(url, data);
+            this.Dispatcher.Invoke(DispatcherPriority.Normal, (ThreadStart)delegate ()
+            {
+                //Clean_Finish(); 
+                //s.Clear();
+                for (int i = 0; i < list_view.Items.Count; i++)
+                {
+                    List_ per = list_view.Items[i] as List_;
+                    if (per.status == "Seeding" || per.status == "Paused")
+                    {
+                        s.Clear();
+                        break;
+                        //s.RemoveAt(i);
+                    }
+                }
+            });
             isCleaned = true;
         }
         /*

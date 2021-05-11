@@ -72,7 +72,7 @@ namespace ADM
                 HttpWebRequest request = (HttpWebRequest)WebRequest.Create(Url + (postDataStr == "" ? "" : "?") + postDataStr);
                 request.Method = "GET";
                 request.ContentType = "text/html;charset=UTF-8";
-                request.Timeout = 5000;
+                //request.Timeout = 5000;
                 request.KeepAlive = true;
                 request.UserAgent = DefaultUserAgent;
                 request.CookieContainer = new CookieContainer();
@@ -95,23 +95,23 @@ namespace ADM
                     return "";
                 }
                 else if (res.StatusCode == HttpStatusCode.OK) //200
-                { }
+                { return ""; }
                 else if (res.StatusCode == HttpStatusCode.BadRequest)//400
-                { }
+                { return ""; }
                 else if (res.StatusCode == HttpStatusCode.NotFound)//404
-                { }
+                { return ""; }
                 else if (res.StatusCode == HttpStatusCode.InternalServerError)//500
                 {
-
+                    return "";
                 }
                 else if (res.StatusCode == HttpStatusCode.Unauthorized)//401
                 {
-
+                    return "";
                 }
                 else
-                { }
+                { return ""; }
             }
-            return "";
+            
         }
 
         /*
@@ -125,7 +125,7 @@ namespace ADM
                 HttpWebRequest request = (HttpWebRequest)WebRequest.Create(Url);
                 CookieContainer myCookieContainer = new CookieContainer();
                 request.Method = "POST";
-                request.Timeout = 5000;
+              //  request.Timeout = 5000;
                 request.KeepAlive = true;
                 request.UserAgent = DefaultUserAgent;
                 request.ContentType = "application/x-www-form-urlencoded";
@@ -225,11 +225,6 @@ namespace ADM
             {
                 ps.Kill();
             }
-        }
-        // 检查是否存在进程
-        public static Process[] checkProcess(string processName)
-        {
-            return Process.GetProcessesByName(processName);
         }
     }
 }
