@@ -29,12 +29,13 @@ namespace ADM
                     }
                 }
             }
+
             // 检查是否已经存在ADM进程 存在则不再新建窗口
             Process[] app = Process.GetProcessesByName("ADM");
             if (app.Length > 1)
              {
-                 // Utils.WriteMessage("已经启动");
-                 Environment.Exit(0);
+                // Utils.WriteMessage("已经启动");
+                Environment.Exit(0);
              }
              else
              {

@@ -5,15 +5,18 @@ using System.Text;
 using System.Configuration;
 using System.Windows;
 using System.Diagnostics;
+using System.Net.Security;
+using System.Security.Cryptography.X509Certificates;
 
 namespace ADM
 {
     class Utils
     {
-        public static string username = "";
-        public static string password = "";
-        public static string router = "";
-        public static string port = "";
+        public static string http_protocol = ConfigurationManager.AppSettings["http_protocol"];
+        public static string username = ConfigurationManager.AppSettings["username"];
+        public static string password = ConfigurationManager.AppSettings["password"];
+        public static string router = ConfigurationManager.AppSettings["router"];
+        public static string port = ConfigurationManager.AppSettings["port"];
         public static string router_url = "";
         public static string asus_cooike = ""; // cookies AuthByPasswd
         public static string path = ""; // cookies path
@@ -24,26 +27,22 @@ namespace ADM
         public static DateTime d1; // 创建时间对象
         public static TimeSpan timeSpan; //创建时间差
         public static Boolean isInit = false;
+        public static Boolean isError = false;
 
+        private static bool CheckValidationResult(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors errors)
+        {
+            return true; //总是接受   
+        }
 
         public static void init()
         {
-            
-            // 获取路由器地址和端口
-            router = ConfigurationManager.AppSettings["router"];
-            port = ConfigurationManager.AppSettings["port"];
-            
-
-            // 获取账号密码
-            username = ConfigurationManager.AppSettings["username"];
-            password = ConfigurationManager.AppSettings["password"];
-
-
+            //HTTPSQ请求
+            ServicePointManager.ServerCertificateValidationCallback = new RemoteCertificateValidationCallback(CheckValidationResult);
 
             // 防止router,port,username,password字段为空
             if (router != "" && port != "" && username != ""&& password!="")
             {
-                router_url =  "http://"+router + ":" + port;
+                router_url =  http_protocol+"://"+router + ":" + port;
                 // 账号密码转换为BASE64→URL加密
                 username = Base64_Convert(username);
                 password = Base64_Convert(password);
@@ -59,7 +58,7 @@ namespace ADM
             {
                 MessageBox.Show("请输入网址,端口,用户名,密码","提示");
                 new setting().ShowDialog();
-                Environment.Exit(0);
+                //Environment.Exit(0);
             }
             isInit = true;
 
@@ -72,7 +71,7 @@ namespace ADM
                 HttpWebRequest request = (HttpWebRequest)WebRequest.Create(Url + (postDataStr == "" ? "" : "?") + postDataStr);
                 request.Method = "GET";
                 request.ContentType = "text/html;charset=UTF-8";
-                //request.Timeout = 5000;
+                request.Timeout = 10000;
                 request.KeepAlive = true;
                 request.UserAgent = DefaultUserAgent;
                 request.CookieContainer = new CookieContainer();
@@ -84,12 +83,13 @@ namespace ADM
                 string retString = myStreamReader.ReadToEnd();
                 myStreamReader.Close();
                 myResponseStream.Close();
-
+                isError = false;
                 return retString;
             }
             catch (WebException ex)
             {
                 HttpWebResponse res = (HttpWebResponse)ex.Response;
+                isError = true;
                 if (res == null)
                 {
                     return "";
@@ -125,7 +125,7 @@ namespace ADM
                 HttpWebRequest request = (HttpWebRequest)WebRequest.Create(Url);
                 CookieContainer myCookieContainer = new CookieContainer();
                 request.Method = "POST";
-              //  request.Timeout = 5000;
+                request.Timeout = 10000;
                 request.KeepAlive = true;
                 request.UserAgent = DefaultUserAgent;
                 request.ContentType = "application/x-www-form-urlencoded";
@@ -158,17 +158,18 @@ namespace ADM
                         path = set_cookies_list[i].Replace("path=", "").Trim();
                     }
                 }
-
+                isError = false;
                 //     String a = response.Cookies["AuthByPasswd"].Value;
             }
             catch(WebException ex)
             {
                 HttpWebResponse res = (HttpWebResponse)ex.Response;
+                isError = true;
                 if (res == null)
                 {
                     MessageBox.Show("网址或端口错误,退出程序", "警告");
-                    new setting().ShowDialog();
-                    Environment.Exit(0);
+                   // new setting().ShowDialog();
+                  //  Environment.Exit(0);
                 }
                 else if (res.StatusCode == HttpStatusCode.OK) //200
                 { }
@@ -183,8 +184,9 @@ namespace ADM
                 else if (res.StatusCode == HttpStatusCode.Unauthorized)//401
                 {
                     MessageBox.Show("账号密码错误或者可能是账号密码错误次数过多,退出程序", "警告");
-                    new setting().ShowDialog();
-                    Environment.Exit(0); }
+                   // new setting().ShowDialog();
+                    //Environment.Exit(0);
+                }
                 else
                 { }
             }

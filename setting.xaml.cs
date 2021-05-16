@@ -20,25 +20,44 @@ namespace ADM
             textbox_port.Text = port;
             textbox_username.Text = username;
             textbox_password.Text = password;
+            if (Utils.http_protocol == "https")
+            {
+                checkbox_http_protocol.IsChecked = true;
+            }
         }
 
         private void btn_confirm_Click(object sender, RoutedEventArgs e)
         {
-            // 写入App.config
-            Configuration cmo = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-            cmo.AppSettings.Settings["router"].Value = textbox_router.Text;
-            cmo.AppSettings.Settings["port"].Value = textbox_port.Text;
-            cmo.AppSettings.Settings["username"].Value = textbox_username.Text;
-            cmo.AppSettings.Settings["password"].Value = textbox_password.Text;
-            cmo.Save();
-            // 退出并重启程序
-            System.Reflection.Assembly.GetEntryAssembly();
-            // string location = System.Reflection.Assembly.GetEntryAssembly().Location;
-            string fileName = Process.GetCurrentProcess().MainModule.FileName; // 获取完整目录文件名*.exe
-            // string startpath = System.IO.Directory.GetCurrentDirectory(); //获取目录
-            // System.Diagnostics.Process.Start(startpath + "\\ASUS_DM.exe"); 
-            System.Diagnostics.Process.Start(fileName); // 启动程序
-            Application.Current.Shutdown(); //关闭程序
+            if (textbox_router.Text!=""&& textbox_port.Text!=""&& textbox_username.Text!=""&& textbox_password.Text!="")
+            {
+                // 写入App.config
+                Configuration cmo = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+                cmo.AppSettings.Settings["router"].Value = textbox_router.Text;
+                cmo.AppSettings.Settings["port"].Value = textbox_port.Text;
+                cmo.AppSettings.Settings["username"].Value = textbox_username.Text;
+                cmo.AppSettings.Settings["password"].Value = textbox_password.Text;
+                cmo.Save();
+                Utils.router = textbox_router.Text;
+                Utils.port = textbox_port.Text;
+                Utils.username = textbox_username.Text;
+                Utils.password = textbox_password.Text;
+                //Utils.http_post_data = 
+                // // 退出并重启程序
+                // System.Reflection.Assembly.GetEntryAssembly();
+                // // string location = System.Reflection.Assembly.GetEntryAssembly().Location;
+                // string fileName = Process.GetCurrentProcess().MainModule.FileName; // 获取完整目录文件名*.exe
+                // // string startpath = System.IO.Directory.GetCurrentDirectory(); //获取目录
+                // // System.Diagnostics.Process.Start(startpath + "\\ASUS_DM.exe"); 
+                // System.Diagnostics.Process.Start(fileName); // 启动程序
+                // Application.Current.Shutdown(); //关闭程序
+                Utils.init();
+                this.Close();
+            }
+            else
+            {
+                MessageBox.Show("数据不能为空");
+            }
+
         }
 
         private void default_downloader_btn(object sender, RoutedEventArgs e)
@@ -63,6 +82,22 @@ namespace ADM
                 commandKey.SetValue("", "\"" + DirectoryName + "\\ADM.exe\" \"%1\"");
             }
 
+        }
+
+        private void checkbox_http_protocol_Checked(object sender, RoutedEventArgs e)
+        {
+            Configuration cmo = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+            if (checkbox_http_protocol.IsChecked==true)
+            {
+                Utils.http_protocol = "https";
+                cmo.AppSettings.Settings["http_protocol"].Value = "https";
+            }
+            else
+            {
+                Utils.http_protocol = "http";
+                cmo.AppSettings.Settings["http_protocol"].Value = "http";
+            }
+            cmo.Save();
         }
     }
 }

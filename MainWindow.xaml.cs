@@ -105,142 +105,148 @@ namespace ADM
         // 捕捉剪贴板的timer方法
         private void timer1_Tick(object sender, EventArgs e)
         {
-            if (Clipboard.ContainsText(TextDataFormat.Text))
-            {
-                string clipboard_text = Clipboard.GetText(TextDataFormat.Text);
-                string magnet = "magnet:?xt=urn:btih:";
-                if (clipboard_text.Contains(magnet) && clipboard_text != magnet_temp)
-                {
-                    string url = Utils.router_url + "/downloadmaster/dm_apply.cgi";
-                    string data = "action_mode=DM_ADD&download_type=5&again=no&usb_dm_url=" + clipboard_text;
-                    Utils.HttpGet(url, data);
-                    magnet_temp = clipboard_text;
-                    Clipboard.Clear();
-                }
-            }
-
             DateTime d2 = DateTime.Now; //获取当前时间
             Utils.timeSpan = d2 - Utils.d1; // 计算时间差
-            // 10分钟重新获取一次cookies
-            if (TimeSpan.FromMinutes(10) <= Utils.timeSpan)
+            if (!Utils.isError)
             {
-                Utils.HttpPost(Utils.http_post_url,Utils.http_post_data); //获取cookies
-                Utils.d1 = DateTime.Now; //刷新时间
-            }
+                if (Clipboard.ContainsText(TextDataFormat.Text))
+                {
+                    string clipboard_text = Clipboard.GetText(TextDataFormat.Text);
+                    string magnet = "magnet:?xt=urn:btih:";
+                    if (clipboard_text.Contains(magnet) && clipboard_text != magnet_temp)
+                    {
+                        string url = Utils.router_url + "/downloadmaster/dm_apply.cgi";
+                        string data = "action_mode=DM_ADD&download_type=5&again=no&usb_dm_url=" + clipboard_text;
+                        Utils.HttpGet(url, data);
+                        magnet_temp = clipboard_text;
+                        Clipboard.Clear();
+                    }
+                }
 
+
+                                                // 10分钟重新获取一次cookies
+                if (TimeSpan.FromMinutes(10) <= Utils.timeSpan)
+                {
+                    Utils.HttpPost(Utils.http_post_url, Utils.http_post_data); //获取cookies
+                    Utils.d1 = DateTime.Now; //刷新时间
+                }
+            }
         }
 
 
         // 定时器方法
         private void timer_Tick(object sender, EventArgs e)
         {
-            string result = Utils.HttpGet(Utils.router_url + "/downloadmaster/dm_print_status.cgi", "action_mode=All").Trim();
-
-            // 防止无数据
-            if (result.Length > 0)
+            if (!Utils.isError)
             {
-                string[] new_list = result.Split("\n,");
-                /*
-                 * s.Count 为 当前列表的列表数 new_list为HTTP GET获取到的数据条目数
-                 * 当前列表数 小于 获取数据条目数 则进行增加操作
-                 * 
-                 * 检测到传回来的下载条目增加
-                 */
-                if (s.Count < new_list.Length)
+                string result = Utils.HttpGet(Utils.router_url + "/downloadmaster/dm_print_status.cgi", "action_mode=All").Trim();
+
+                // 防止无数据
+                if (result.Length > 0)
                 {
-                    for (int i = s.Count; i < new_list.Length; i++)
+                    string[] new_list = result.Split("\n,");
+                    /*
+                     * s.Count 为 当前列表的列表数 new_list为HTTP GET获取到的数据条目数
+                     * 当前列表数 小于 获取数据条目数 则进行增加操作
+                     * 
+                     * 检测到传回来的下载条目增加
+                     */
+                    if (s.Count < new_list.Length)
                     {
-                        string[] new_list_t = Utils.delete_brackets(new_list[i]);
-                        s.Add(new List_
+                        for (int i = s.Count; i < new_list.Length; i++)
                         {
-                            table_id = new_list_t[0].Replace("\"", ""),
-                            title = new_list_t[1],
-                            percent = new_list_t[2],
-                            size = new_list_t[3],
-                            status = new_list_t[4],
-                            type = new_list_t[5],
-                            time = new_list_t[6],
-                            download_speed = new_list_t[7],
-                            upload_speed = new_list_t[8],
-                            peers = new_list_t[9]
-                        });
+                            string[] new_list_t = Utils.delete_brackets(new_list[i]);
+                            s.Add(new List_
+                            {
+                                table_id = new_list_t[0].Replace("\"", ""),
+                                title = new_list_t[1],
+                                percent = new_list_t[2],
+                                size = new_list_t[3],
+                                status = new_list_t[4],
+                                type = new_list_t[5],
+                                time = new_list_t[6],
+                                download_speed = new_list_t[7],
+                                upload_speed = new_list_t[8],
+                                peers = new_list_t[9]
+                            });
+                        }
                     }
-                }
-                /* 
-                 * 检测到传回来的下载条目减少
-                 * 逻辑:
-                 * table_id和title相同 则判定该条目没有被删除,continue跳出
-                 * 若table_id对上 则代表该条目已经被代替,则进行更新
-                 * 若table_id和titile对不上 则代表该条目已失效 删除
-                 */
-                else if (s.Count > new_list.Length)
-                {
-                    
-                    for (int i = s.Count; i < new_list.Length; i++)
+                    /* 
+                     * 检测到传回来的下载条目减少
+                     * 逻辑:
+                     * table_id和title相同 则判定该条目没有被删除,continue跳出
+                     * 若table_id对上 则代表该条目已经被代替,则进行更新
+                     * 若table_id和titile对不上 则代表该条目已失效 删除
+                     */
+                    else if (s.Count > new_list.Length)
                     {
-                        string[] new_list_t = Utils.delete_brackets(new_list[i]);
-                        s.Add(new List_
+
+                        for (int i = s.Count; i < new_list.Length; i++)
                         {
-                            table_id = new_list_t[0].Replace("\"", ""),
-                            title = new_list_t[1],
-                            percent = new_list_t[2],
-                            size = new_list_t[3],
-                            status = new_list_t[4],
-                            type = new_list_t[5],
-                            time = new_list_t[6],
-                            download_speed = new_list_t[7],
-                            upload_speed = new_list_t[8],
-                            peers = new_list_t[9]
-                        });
+                            string[] new_list_t = Utils.delete_brackets(new_list[i]);
+                            s.Add(new List_
+                            {
+                                table_id = new_list_t[0].Replace("\"", ""),
+                                title = new_list_t[1],
+                                percent = new_list_t[2],
+                                size = new_list_t[3],
+                                status = new_list_t[4],
+                                type = new_list_t[5],
+                                time = new_list_t[6],
+                                download_speed = new_list_t[7],
+                                upload_speed = new_list_t[8],
+                                peers = new_list_t[9]
+                            });
+                        }
+                        //for (int i = 0; i < s.Count; i++)
+                        //{
+                        //    string[] new_list_t = Utils.delete_brackets(new_list[i]);
+                        //    List_ per = list_view.Items[i] as List_;
+                        //    string new_list_table_id = new_list_t[0].Replace("\"", "");
+                        //    string new_list_title = new_list_t[1];
+                        //    if (per.table_id == new_list_table_id && per.title == new_list_title)
+                        //    {
+                        //        continue;
+                        //    }
+                        //    else if(per.table_id == new_list_table_id)
+                        //    {
+                        //        per.title = new_list_title;
+                        //        per.percent = new_list_t[2];
+                        //        per.size = new_list_t[3];
+                        //        per.status = new_list_t[4];
+                        //        per.type = new_list_t[5];
+                        //        per.time = new_list_t[6];
+                        //        per.download_speed = new_list_t[7];
+                        //        per.upload_speed = new_list_t[8];
+                        //        per.peers = new_list_t[9];
+                        //    }
+                        //    else
+                        //    {
+                        //        s.RemoveAt(i);
+                        //    }
+                        //}
                     }
-                    //for (int i = 0; i < s.Count; i++)
-                    //{
-                    //    string[] new_list_t = Utils.delete_brackets(new_list[i]);
-                    //    List_ per = list_view.Items[i] as List_;
-                    //    string new_list_table_id = new_list_t[0].Replace("\"", "");
-                    //    string new_list_title = new_list_t[1];
-                    //    if (per.table_id == new_list_table_id && per.title == new_list_title)
-                    //    {
-                    //        continue;
-                    //    }
-                    //    else if(per.table_id == new_list_table_id)
-                    //    {
-                    //        per.title = new_list_title;
-                    //        per.percent = new_list_t[2];
-                    //        per.size = new_list_t[3];
-                    //        per.status = new_list_t[4];
-                    //        per.type = new_list_t[5];
-                    //        per.time = new_list_t[6];
-                    //        per.download_speed = new_list_t[7];
-                    //        per.upload_speed = new_list_t[8];
-                    //        per.peers = new_list_t[9];
-                    //    }
-                    //    else
-                    //    {
-                    //        s.RemoveAt(i);
-                    //    }
-                    //}
-                }
-                /*
-                 * 没有新的下载增加,直接进行刷新操作
-                 * 读取数据 刷新每一个条目
-                 */ 
-                else
-                {
-                    for (int i = 0; i < new_list.Length; i++)
+                    /*
+                     * 没有新的下载增加,直接进行刷新操作
+                     * 读取数据 刷新每一个条目
+                     */
+                    else
                     {
-                        string[] new_list_t = Utils.delete_brackets(new_list[i]);
-                        List_ per = list_view.Items[i] as List_;
-                        per.table_id = new_list_t[0].Replace("\"", "");
-                        per.title = new_list_t[1];
-                        per.percent = new_list_t[2];
-                        per.size = new_list_t[3];
-                        per.status = new_list_t[4];
-                        per.type = new_list_t[5];
-                        per.time = new_list_t[6];
-                        per.download_speed = new_list_t[7];
-                        per.upload_speed = new_list_t[8];
-                        per.peers = new_list_t[9];
+                        for (int i = 0; i < new_list.Length; i++)
+                        {
+                            string[] new_list_t = Utils.delete_brackets(new_list[i]);
+                            List_ per = list_view.Items[i] as List_;
+                            per.table_id = new_list_t[0].Replace("\"", "");
+                            per.title = new_list_t[1];
+                            per.percent = new_list_t[2];
+                            per.size = new_list_t[3];
+                            per.status = new_list_t[4];
+                            per.type = new_list_t[5];
+                            per.time = new_list_t[6];
+                            per.download_speed = new_list_t[7];
+                            per.upload_speed = new_list_t[8];
+                            per.peers = new_list_t[9];
+                        }
                     }
                 }
             }
