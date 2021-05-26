@@ -12,10 +12,10 @@ namespace ADM
         {
             InitializeComponent();
             // 读取App.config
-            string router = ConfigurationManager.AppSettings["router"];
-            string port = ConfigurationManager.AppSettings["port"];
-            string username = ConfigurationManager.AppSettings["username"];
-            string password = ConfigurationManager.AppSettings["password"];
+            string router = Utils.router;
+            string port = Utils.port;
+            string username = Utils.raw_username;
+            string password = Utils.raw_password;
             textbox_router.Text = router;
             textbox_port.Text = port;
             textbox_username.Text = username;
@@ -39,8 +39,8 @@ namespace ADM
                 cmo.Save();
                 Utils.router = textbox_router.Text;
                 Utils.port = textbox_port.Text;
-                Utils.username = textbox_username.Text;
-                Utils.password = textbox_password.Text;
+                Utils.raw_username = textbox_username.Text;
+                Utils.raw_password = textbox_password.Text;
                 //Utils.http_post_data = 
                 // // 退出并重启程序
                 // System.Reflection.Assembly.GetEntryAssembly();

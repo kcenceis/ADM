@@ -13,8 +13,10 @@ namespace ADM
     class Utils
     {
         public static string http_protocol = ConfigurationManager.AppSettings["http_protocol"];
-        public static string username = ConfigurationManager.AppSettings["username"];
-        public static string password = ConfigurationManager.AppSettings["password"];
+        public static string raw_username = ConfigurationManager.AppSettings["username"];
+        public static string raw_password = ConfigurationManager.AppSettings["password"];
+        public static string username;
+        public static string password;
         public static string router = ConfigurationManager.AppSettings["router"];
         public static string port = ConfigurationManager.AppSettings["port"];
         public static string router_url = "";
@@ -44,8 +46,8 @@ namespace ADM
             {
                 router_url =  http_protocol+"://"+router + ":" + port;
                 // 账号密码转换为BASE64→URL加密
-                username = Base64_Convert(username);
-                password = Base64_Convert(password);
+                username = Base64_Convert(raw_username);
+                password = Base64_Convert(raw_password);
 
                 // 获取登录cookies
                 http_post_url = router_url + "/check.asp";
