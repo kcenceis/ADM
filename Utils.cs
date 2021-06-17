@@ -36,13 +36,13 @@ namespace ADM
             return true; //总是接受   
         }
 
-        public static void init()
+        public static void init(string _router="",string _port="",string _user = "",string _pass="")
         {
             //HTTPSQ请求
             ServicePointManager.ServerCertificateValidationCallback = new RemoteCertificateValidationCallback(CheckValidationResult);
 
             // 防止router,port,username,password字段为空
-            if (router != "" && port != "" && username != ""&& password!="")
+            if (router != "" && port != "" && raw_username != ""&& raw_password!="")
             {
                 router_url =  http_protocol+"://"+router + ":" + port;
                 // 账号密码转换为BASE64→URL加密
@@ -56,6 +56,7 @@ namespace ADM
                 // 记录获取到cookies的系统时间,用于更新cookies 防止超时
                 d1 = DateTime.Now;
             }
+
             else
             {
                 MessageBox.Show("请输入网址,端口,用户名,密码","提示");
