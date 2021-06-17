@@ -1,0 +1,9 @@
+﻿<Application x:Class="ADM.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Startup="command_download_link"
+             >
+    <Application.Resources>
+
+    </Application.Resources>
+</Application>
