@@ -25,4 +25,4 @@ ASUS路由器下载大师(downloadmaster) windows客户端
 密码:路由器密码
 
 # Capture
-<img width="658.4" height="357.2" align="left" src="https://github.com/kcenceis/ADM/raw/main/png/ADM.png"/>
+<img width="658.4" height="357.2" align="left" src="png/ADM.png"/>
